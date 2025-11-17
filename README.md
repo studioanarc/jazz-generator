@@ -1,42 +1,51 @@
-# Quantum Jazz Generator
+# Jazz Generator
 
-A futuristic generative jazz music web application that creates infinite, evolving jazz compositions in real-time using Web Audio API synthesis.
+A generative jazz music web application that creates authentic jazz compositions in real-time using Web Audio API synthesis and proper music theory.
 
 ## Features
 
 ### 🎹 Virtual Instruments
-- **Piano**: Multi-harmonic synthesis with realistic envelope
-- **Bass**: Rich sawtooth synth with sub-oscillator
-- **Organ**: Hammond-style drawbar synthesis with multiple harmonics
-- **Drums**: Kick, snare, hi-hat, and ride cymbal synthesis
+- **Piano**: Multi-partial synthesis with authentic piano envelope and jazz comping rhythms
+- **Bass**: Upright bass sound with proper walking bass technique
+- **Drums**: Ride cymbal, hi-hat, kick, snare, and ride bell with jazz feel
 
-### 🎵 Intelligent Music Generation
-- **Melody Generation**: Context-aware melodic lines based on scales and complexity settings
-- **Harmony Generation**: Jazz chord progressions (ii-V-I, blues changes, modal harmony)
-- **Bassline Generation**: Walking bass patterns that follow chord changes
-- **Drum Patterns**: Swing-aware rhythms with configurable density
+### 🎵 Authentic Jazz Generation
+Built on proper jazz music theory:
 
-### 🎚️ User Controls
-- **Root Note**: Select the key (C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B)
-- **Scale/Mode**: Choose from Major, Minor, Dorian, Mixolydian, Blues, Bebop, Whole Tone, Diminished
-- **Tempo**: 60-240 BPM
-- **Harmonic Complexity**: Slide from harmonic to wild (affects chord extensions and note choices)
-- **Note Density**: Control how many notes are generated
-- **Swing Feel**: Adjust from straight to heavy swing
+- **Chord Progressions**: Real ii-V-I, I-vi-ii-V, blues changes, and rhythm changes
+- **Chord Voicings**: Proper 7th chord extensions (9ths, 11ths, 13ths) with rootless voicings
+- **Voice Leading**: Smooth transitions between chords
+- **Walking Bass**: Uses chord tones on strong beats and chromatic approach tones
+- **Piano Comping**: Syncopated rhythms with proper jazz voicings
+- **Improvisation**: Scale-appropriate note choices (Dorian over min7, Mixolydian over dom7)
+- **Swing Timing**: Authentic swing feel (adjustable ratio from straight to heavy swing)
 
-### 🎛️ Effects
-- **Reverb**: Convolution reverb for space and depth
-- **Delay**: Tempo-synced delay with feedback
-- **Filter**: Low-pass filter for tone shaping
-- **Distortion**: Add grit and character
+### 🎚️ Minimal Interface
+Clean, organized controls divided into three tabs:
+
+**Style Tab:**
+- Key selection
+- Tempo (60-240 BPM)
+- Complexity (affects extensions and alterations)
+- Swing feel (50-75% ratio)
+- 6 preset styles
+
+**Mix Tab:**
+- Individual instrument volumes
+- Note density control
+
+**Effects Tab:**
+- Reverb
+- Delay
+- Tone (brightness/darkness)
 
 ### 🎨 Presets
-- **Cool Jazz**: Relaxed, modal feel (F Dorian, 100 BPM)
-- **Bebop**: Fast, complex melodies (Bb Bebop, 180 BPM)
-- **Fusion**: Electric energy with effects (E Mixolydian, 140 BPM)
-- **Modal**: Spacious and meditative (D Dorian, 90 BPM)
-- **Free Jazz**: Experimental and wild (Ab Whole Tone, 160 BPM)
-- **Smooth**: Easy listening jazz (G Major, 85 BPM)
+- **Bebop**: Fast, virtuosic (200 BPM in Bb)
+- **Cool Jazz**: Laid-back, sophisticated (120 BPM in D)
+- **Modal**: Spacious, contemplative (110 BPM in D)
+- **Swing**: Classic big band feel (160 BPM in F)
+- **Latin**: Afro-Cuban influenced (140 BPM in G)
+- **Ballad**: Slow and intimate (70 BPM in Eb)
 
 ## How to Use
 
@@ -66,12 +75,16 @@ A futuristic generative jazz music web application that creates infinite, evolvi
 - **presets.js**: Preset configurations
 - **main.js**: Application controller and UI management
 
-### Music Theory
-The generator uses jazz-appropriate music theory:
-- Scales include jazz modes (Dorian, Mixolydian) and bebop scales
-- Chord progressions use ii-V-I patterns and modal harmony
-- Swing timing is applied to rhythms
-- Note selection considers harmonic context and voice leading
+### Music Theory Implementation
+The generator implements authentic jazz theory:
+- **Chord types**: maj7, min7, dom7, with proper extensions
+- **Scales**: Mode-to-chord matching (Dorian for min7, Mixolydian for dom7, etc.)
+- **Progressions**: ii-V-I, I-vi-ii-V, blues changes, rhythm changes
+- **Voice leading**: Minimal movement between chord tones
+- **Walking bass**: Root on beat 1, chord tones on 2-3, chromatic approach on 4
+- **Swing ratio**: Variable from 1:1 (straight) to 3:1 (heavy), typically around 2:1
+- **Comping patterns**: Syncopated rhythms (hits on & beats)
+- **Improvisation**: Favors chord tones on strong beats, scale tones on weak beats
 
 ### Browser Requirements
 - Modern browser with Web Audio API support

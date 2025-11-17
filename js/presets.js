@@ -1,122 +1,110 @@
 export const presets = {
-    'cool-jazz': {
-        rootNote: 'F',
-        scaleType: 'dorian',
-        tempo: 100,
-        complexity: 35,
-        density: 40,
-        swing: 60,
-        instruments: {
-            piano: true,
-            bass: true,
-            organ: false,
-            drums: true
-        },
-        effects: {
-            reverb: 60,
-            delay: 30,
-            filterFreq: 70,
-            distortion: 0
-        }
-    },
     'bebop': {
         rootNote: 'Bb',
-        scaleType: 'bebop',
-        tempo: 180,
-        complexity: 80,
-        density: 75,
-        swing: 70,
-        instruments: {
-            piano: true,
-            bass: true,
-            organ: false,
-            drums: true
+        style: 'bebop',
+        tempo: 200,
+        complexity: 75,
+        density: 65,
+        swing: 67,
+        volumes: {
+            piano: 70,
+            bass: 75,
+            drums: 60
         },
         effects: {
-            reverb: 40,
-            delay: 20,
-            filterFreq: 85,
-            distortion: 5
+            reverb: 25,
+            delay: 10,
+            tone: 75
         }
     },
-    'fusion': {
-        rootNote: 'E',
-        scaleType: 'mixolydian',
-        tempo: 140,
-        complexity: 65,
-        density: 70,
-        swing: 55,
-        instruments: {
-            piano: true,
-            bass: true,
-            organ: true,
-            drums: true
+    'cool': {
+        rootNote: 'D',
+        style: 'cool',
+        tempo: 120,
+        complexity: 45,
+        density: 40,
+        swing: 65,
+        volumes: {
+            piano: 65,
+            bass: 70,
+            drums: 50
         },
         effects: {
-            reverb: 50,
-            delay: 45,
-            filterFreq: 75,
-            distortion: 25
+            reverb: 45,
+            delay: 20,
+            tone: 60
         }
     },
     'modal': {
         rootNote: 'D',
-        scaleType: 'dorian',
-        tempo: 90,
+        style: 'modal',
+        tempo: 110,
         complexity: 30,
         density: 35,
-        swing: 50,
-        instruments: {
-            piano: true,
-            bass: true,
-            organ: true,
-            drums: true
-        },
-        effects: {
-            reverb: 70,
-            delay: 40,
-            filterFreq: 65,
-            distortion: 0
-        }
-    },
-    'free-jazz': {
-        rootNote: 'Ab',
-        scaleType: 'wholetone',
-        tempo: 160,
-        complexity: 95,
-        density: 85,
-        swing: 50,
-        instruments: {
-            piano: true,
-            bass: true,
-            organ: true,
-            drums: true
+        swing: 63,
+        volumes: {
+            piano: 60,
+            bass: 65,
+            drums: 45
         },
         effects: {
             reverb: 55,
-            delay: 60,
-            filterFreq: 80,
-            distortion: 15
+            delay: 25,
+            tone: 55
         }
     },
-    'smooth': {
-        rootNote: 'G',
-        scaleType: 'major',
-        tempo: 85,
-        complexity: 25,
-        density: 45,
-        swing: 65,
-        instruments: {
-            piano: true,
-            bass: true,
-            organ: true,
-            drums: true
+    'swing': {
+        rootNote: 'F',
+        style: 'swing',
+        tempo: 160,
+        complexity: 50,
+        density: 55,
+        swing: 70,
+        volumes: {
+            piano: 75,
+            bass: 80,
+            drums: 70
         },
         effects: {
-            reverb: 65,
-            delay: 35,
-            filterFreq: 60,
-            distortion: 0
+            reverb: 30,
+            delay: 15,
+            tone: 70
+        }
+    },
+    'latin': {
+        rootNote: 'G',
+        style: 'latin',
+        tempo: 140,
+        complexity: 60,
+        density: 60,
+        swing: 55,
+        volumes: {
+            piano: 70,
+            bass: 75,
+            drums: 65
+        },
+        effects: {
+            reverb: 40,
+            delay: 20,
+            tone: 65
+        }
+    },
+    'ballad': {
+        rootNote: 'Eb',
+        style: 'ballad',
+        tempo: 70,
+        complexity: 40,
+        density: 30,
+        swing: 60,
+        volumes: {
+            piano: 60,
+            bass: 65,
+            drums: 40
+        },
+        effects: {
+            reverb: 60,
+            delay: 30,
+            tone: 50
         }
     }
 };

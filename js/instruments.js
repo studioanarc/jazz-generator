@@ -23,63 +23,60 @@ export class Instrument {
         const semitone = notes[note];
         return 440 * Math.pow(2, (octave - 4) + (semitone - 9) / 12);
     }
+
+    setVolume(value) {
+        this.output.gain.setTargetAtTime(value / 100, this.ctx.currentTime, 0.01);
+    }
 }
 
 export class Piano extends Instrument {
     constructor(audioEngine, effectsProcessor) {
         super(audioEngine, effectsProcessor);
-        this.activeNotes = new Map();
     }
 
-    playNote(note, octave, duration, time = 0) {
+    playNote(note, octave, duration, time = 0, velocity = 0.7) {
         const freq = this.noteToFrequency(note, octave);
         const startTime = this.ctx.currentTime + time;
 
-        const osc1 = this.ctx.createOscillator();
-        const osc2 = this.ctx.createOscillator();
-        const osc3 = this.ctx.createOscillator();
+        // More realistic piano with multiple partials
+        const partials = [
+            {mult: 1, amp: 1.0},
+            {mult: 2, amp: 0.4},
+            {mult: 3, amp: 0.2},
+            {mult: 4.2, amp: 0.12},
+            {mult: 5.4, amp: 0.08}
+        ];
 
-        osc1.type = 'sine';
-        osc2.type = 'sine';
-        osc3.type = 'triangle';
+        const noteGain = this.ctx.createGain();
+        noteGain.gain.value = 0;
 
-        osc1.frequency.value = freq;
-        osc2.frequency.value = freq * 2;
-        osc3.frequency.value = freq * 3;
+        // Piano envelope: quick attack, medium sustain, slow release
+        const attack = 0.002;
+        const decay = 0.1;
+        const sustain = velocity * 0.3;
+        const release = duration * 0.3;
 
-        const gain1 = this.ctx.createGain();
-        const gain2 = this.ctx.createGain();
-        const gain3 = this.ctx.createGain();
+        noteGain.gain.setValueAtTime(0, startTime);
+        noteGain.gain.linearRampToValueAtTime(velocity * 0.8, startTime + attack);
+        noteGain.gain.exponentialRampToValueAtTime(sustain, startTime + attack + decay);
+        noteGain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
 
-        gain1.gain.value = 0.5;
-        gain2.gain.value = 0.2;
-        gain3.gain.value = 0.1;
+        partials.forEach(partial => {
+            const osc = this.ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = freq * partial.mult;
 
-        const envelope = this.ctx.createGain();
-        envelope.gain.value = 0;
+            const gain = this.ctx.createGain();
+            gain.gain.value = partial.amp;
 
-        envelope.gain.setValueAtTime(0, startTime);
-        envelope.gain.linearRampToValueAtTime(0.3, startTime + 0.01);
-        envelope.gain.exponentialRampToValueAtTime(0.2, startTime + 0.1);
-        envelope.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            osc.connect(gain);
+            gain.connect(noteGain);
 
-        osc1.connect(gain1);
-        osc2.connect(gain2);
-        osc3.connect(gain3);
+            osc.start(startTime);
+            osc.stop(startTime + duration + release);
+        });
 
-        gain1.connect(envelope);
-        gain2.connect(envelope);
-        gain3.connect(envelope);
-
-        envelope.connect(this.output);
-
-        osc1.start(startTime);
-        osc2.start(startTime);
-        osc3.start(startTime);
-
-        osc1.stop(startTime + duration + 0.1);
-        osc2.stop(startTime + duration + 0.1);
-        osc3.stop(startTime + duration + 0.1);
+        noteGain.connect(this.output);
     }
 }
 
@@ -88,100 +85,52 @@ export class Bass extends Instrument {
         super(audioEngine, effectsProcessor);
     }
 
-    playNote(note, octave, duration, time = 0) {
+    playNote(note, octave, duration, time = 0, velocity = 0.7) {
         const freq = this.noteToFrequency(note, octave);
         const startTime = this.ctx.currentTime + time;
 
+        // Upright bass sound
         const osc = this.ctx.createOscillator();
-        const subOsc = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
 
-        osc.type = 'sawtooth';
-        subOsc.type = 'sine';
+        osc.type = 'triangle';
+        osc2.type = 'sine';
 
         osc.frequency.value = freq;
-        subOsc.frequency.value = freq / 2;
+        osc2.frequency.value = freq * 2;
 
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'lowpass';
-        filter.frequency.value = freq * 4;
-        filter.Q.value = 5;
+        filter.frequency.value = freq * 3;
+        filter.Q.value = 2;
 
         const gain = this.ctx.createGain();
-        const subGain = this.ctx.createGain();
+        const gain2 = this.ctx.createGain();
 
-        gain.gain.value = 0.4;
-        subGain.gain.value = 0.3;
+        gain.gain.value = velocity * 0.6;
+        gain2.gain.value = velocity * 0.2;
 
         const envelope = this.ctx.createGain();
         envelope.gain.value = 0;
 
+        // Plucked bass envelope
         envelope.gain.setValueAtTime(0, startTime);
-        envelope.gain.linearRampToValueAtTime(0.8, startTime + 0.05);
-        envelope.gain.exponentialRampToValueAtTime(0.4, startTime + 0.2);
+        envelope.gain.linearRampToValueAtTime(1, startTime + 0.01);
+        envelope.gain.exponentialRampToValueAtTime(0.3, startTime + 0.08);
         envelope.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
 
         osc.connect(gain);
-        subOsc.connect(subGain);
-
+        osc2.connect(gain2);
         gain.connect(filter);
-        subGain.connect(filter);
-
+        gain2.connect(filter);
         filter.connect(envelope);
         envelope.connect(this.output);
 
         osc.start(startTime);
-        subOsc.start(startTime);
+        osc2.start(startTime);
 
         osc.stop(startTime + duration + 0.1);
-        subOsc.stop(startTime + duration + 0.1);
-    }
-}
-
-export class Organ extends Instrument {
-    constructor(audioEngine, effectsProcessor) {
-        super(audioEngine, effectsProcessor);
-    }
-
-    playNote(note, octave, duration, time = 0) {
-        const freq = this.noteToFrequency(note, octave);
-        const startTime = this.ctx.currentTime + time;
-
-        const harmonics = [1, 2, 3, 4, 5, 6, 8];
-        const gains = [0.4, 0.3, 0.2, 0.15, 0.1, 0.08, 0.05];
-
-        const envelope = this.ctx.createGain();
-        envelope.gain.value = 0;
-
-        envelope.gain.setValueAtTime(0, startTime);
-        envelope.gain.linearRampToValueAtTime(0.6, startTime + 0.05);
-        envelope.gain.linearRampToValueAtTime(0.5, startTime + duration - 0.1);
-        envelope.gain.linearRampToValueAtTime(0, startTime + duration);
-
-        harmonics.forEach((harmonic, index) => {
-            const osc = this.ctx.createOscillator();
-            osc.type = 'sine';
-            osc.frequency.value = freq * harmonic;
-
-            const gain = this.ctx.createGain();
-            gain.gain.value = gains[index];
-
-            osc.connect(gain);
-            gain.connect(envelope);
-
-            osc.start(startTime);
-            osc.stop(startTime + duration + 0.1);
-        });
-
-        const vibrato = this.ctx.createOscillator();
-        vibrato.frequency.value = 5;
-        const vibratoGain = this.ctx.createGain();
-        vibratoGain.gain.value = 3;
-
-        vibrato.connect(vibratoGain);
-        vibrato.start(startTime);
-        vibrato.stop(startTime + duration + 0.1);
-
-        envelope.connect(this.output);
+        osc2.stop(startTime + duration + 0.1);
     }
 }
 
@@ -190,31 +139,32 @@ export class Drums extends Instrument {
         super(audioEngine, effectsProcessor);
     }
 
-    playKick(time = 0) {
+    playKick(time = 0, velocity = 0.7) {
         const startTime = this.ctx.currentTime + time;
 
         const osc = this.ctx.createOscillator();
-        osc.frequency.value = 150;
+        osc.frequency.value = 120;
 
         const gain = this.ctx.createGain();
         gain.gain.value = 0;
 
-        osc.frequency.setValueAtTime(150, startTime);
-        osc.frequency.exponentialRampToValueAtTime(50, startTime + 0.05);
+        osc.frequency.setValueAtTime(120, startTime);
+        osc.frequency.exponentialRampToValueAtTime(40, startTime + 0.05);
 
-        gain.gain.setValueAtTime(1, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+        gain.gain.setValueAtTime(velocity, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
 
         osc.connect(gain);
         gain.connect(this.output);
 
         osc.start(startTime);
-        osc.stop(startTime + 0.3);
+        osc.stop(startTime + 0.4);
     }
 
-    playSnare(time = 0) {
+    playSnare(time = 0, velocity = 0.5) {
         const startTime = this.ctx.currentTime + time;
 
+        // Noise for snare
         const noise = this.ctx.createBufferSource();
         const buffer = this.ctx.createBuffer(1, this.ctx.sampleRate * 0.2, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
@@ -227,30 +177,23 @@ export class Drums extends Instrument {
 
         const noiseFilter = this.ctx.createBiquadFilter();
         noiseFilter.type = 'highpass';
-        noiseFilter.frequency.value = 1000;
-
-        const osc = this.ctx.createOscillator();
-        osc.frequency.value = 180;
+        noiseFilter.frequency.value = 2000;
 
         const gain = this.ctx.createGain();
         gain.gain.value = 0;
 
-        gain.gain.setValueAtTime(0.7, startTime);
+        gain.gain.setValueAtTime(velocity * 0.6, startTime);
         gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
 
         noise.connect(noiseFilter);
         noiseFilter.connect(gain);
-        osc.connect(gain);
         gain.connect(this.output);
 
         noise.start(startTime);
-        osc.start(startTime);
-
         noise.stop(startTime + 0.15);
-        osc.stop(startTime + 0.15);
     }
 
-    playHiHat(time = 0, closed = true) {
+    playHiHat(time = 0, closed = true, velocity = 0.4) {
         const startTime = this.ctx.currentTime + time;
 
         const noise = this.ctx.createBufferSource();
@@ -265,12 +208,12 @@ export class Drums extends Instrument {
 
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'highpass';
-        filter.frequency.value = 7000;
+        filter.frequency.value = 8000;
 
         const gain = this.ctx.createGain();
         const duration = closed ? 0.05 : 0.15;
 
-        gain.gain.setValueAtTime(0.3, startTime);
+        gain.gain.setValueAtTime(velocity, startTime);
         gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
 
         noise.connect(filter);
@@ -281,32 +224,67 @@ export class Drums extends Instrument {
         noise.stop(startTime + duration);
     }
 
-    playRide(time = 0) {
+    playRide(time = 0, velocity = 0.5) {
         const startTime = this.ctx.currentTime + time;
 
-        const osc1 = this.ctx.createOscillator();
-        const osc2 = this.ctx.createOscillator();
+        // Ride cymbal using filtered noise and metallic partials
+        const noise = this.ctx.createBufferSource();
+        const buffer = this.ctx.createBuffer(1, this.ctx.sampleRate * 0.3, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
 
-        osc1.frequency.value = 800;
-        osc2.frequency.value = 540;
+        for (let i = 0; i < buffer.length; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.15));
+        }
 
-        osc1.type = 'square';
-        osc2.type = 'square';
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 4000;
+        filter.Q.value = 1;
 
         const gain = this.ctx.createGain();
         gain.gain.value = 0;
 
-        gain.gain.setValueAtTime(0.2, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+        gain.gain.setValueAtTime(velocity * 0.5, startTime);
+        gain.gain.exponentialRampToValueAtTime(velocity * 0.3, startTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
 
-        osc1.connect(gain);
-        osc2.connect(gain);
+        noise.connect(filter);
+        filter.connect(gain);
         gain.connect(this.output);
 
-        osc1.start(startTime);
-        osc2.start(startTime);
+        noise.start(startTime);
+        noise.stop(startTime + 0.4);
+    }
 
-        osc1.stop(startTime + 0.3);
-        osc2.stop(startTime + 0.3);
+    playRideBell(time = 0, velocity = 0.6) {
+        const startTime = this.ctx.currentTime + time;
+
+        // Bell sound with metallic partials
+        const partials = [800, 1071, 1431, 1920];
+
+        const bellGain = this.ctx.createGain();
+        bellGain.gain.value = 0;
+
+        bellGain.gain.setValueAtTime(velocity * 0.4, startTime);
+        bellGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
+
+        partials.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+
+            const gain = this.ctx.createGain();
+            gain.gain.value = 1 / (i + 1);
+
+            osc.connect(gain);
+            gain.connect(bellGain);
+
+            osc.start(startTime);
+            osc.stop(startTime + 0.5);
+        });
+
+        bellGain.connect(this.output);
     }
 }

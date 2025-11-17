@@ -102,17 +102,9 @@ export class EffectsProcessor {
         this.delayFeedback.gain.setTargetAtTime((value / 100) * 0.5, this.ctx.currentTime, 0.1);
     }
 
-    setFilterFrequency(value) {
-        const freq = 200 + (value / 100) * 19800;
+    setTone(value) {
+        // Tone control: 0 = dark, 100 = bright
+        const freq = 500 + (value / 100) * 9500;
         this.filterNode.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.1);
-    }
-
-    setDistortion(value) {
-        if (value > 0) {
-            this.distortionNode.curve = this.makeDistortionCurve(value);
-            this.distortionGain.gain.setTargetAtTime(value / 100, this.ctx.currentTime, 0.1);
-        } else {
-            this.distortionGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
-        }
     }
 }
