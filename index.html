@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Jazz Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">
+                <span class="quantum">QUANTUM</span>
+                <span class="jazz">JAZZ</span>
+            </h1>
+            <p class="subtitle">Generative Jazz Music Engine</p>
+        </header>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <div class="control-section">
+                    <h2>Musical Parameters</h2>
+
+                    <div class="control-group">
+                        <label for="root-note">Root Note</label>
+                        <select id="root-note">
+                            <option value="C">C</option>
+                            <option value="Db">Db</option>
+                            <option value="D">D</option>
+                            <option value="Eb">Eb</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                            <option value="Gb">Gb</option>
+                            <option value="G">G</option>
+                            <option value="Ab">Ab</option>
+                            <option value="A">A</option>
+                            <option value="Bb">Bb</option>
+                            <option value="B">B</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="scale-type">Scale/Mode</label>
+                        <select id="scale-type">
+                            <option value="major">Major</option>
+                            <option value="minor">Minor</option>
+                            <option value="dorian">Dorian</option>
+                            <option value="mixolydian">Mixolydian</option>
+                            <option value="blues">Blues</option>
+                            <option value="bebop">Bebop</option>
+                            <option value="wholetone">Whole Tone</option>
+                            <option value="diminished">Diminished</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="tempo">Tempo: <span id="tempo-value">120</span> BPM</label>
+                        <input type="range" id="tempo" min="60" max="240" value="120" step="5">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="complexity">Harmonic Complexity</label>
+                        <input type="range" id="complexity" min="0" max="100" value="50">
+                        <div class="range-labels">
+                            <span>Harmonic</span>
+                            <span>Wild</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="density">Note Density</label>
+                        <input type="range" id="density" min="0" max="100" value="50">
+                        <div class="range-labels">
+                            <span>Sparse</span>
+                            <span>Dense</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="swing">Swing Feel</label>
+                        <input type="range" id="swing" min="0" max="100" value="65">
+                        <div class="range-labels">
+                            <span>Straight</span>
+                            <span>Swing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h2>Instruments</h2>
+                    <div class="instrument-toggles">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="inst-piano" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Piano</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="inst-bass" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Bass</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="inst-organ" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Organ</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="inst-drums" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Drums</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h2>Effects</h2>
+
+                    <div class="control-group">
+                        <label for="reverb">Reverb</label>
+                        <input type="range" id="reverb" min="0" max="100" value="40">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="delay">Delay</label>
+                        <input type="range" id="delay" min="0" max="100" value="20">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="filter-freq">Filter Cutoff</label>
+                        <input type="range" id="filter-freq" min="0" max="100" value="80">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="distortion">Distortion</label>
+                        <input type="range" id="distortion" min="0" max="100" value="0">
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h2>Presets</h2>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" data-preset="cool-jazz">Cool Jazz</button>
+                        <button class="preset-btn" data-preset="bebop">Bebop</button>
+                        <button class="preset-btn" data-preset="fusion">Fusion</button>
+                        <button class="preset-btn" data-preset="modal">Modal</button>
+                        <button class="preset-btn" data-preset="free-jazz">Free Jazz</button>
+                        <button class="preset-btn" data-preset="smooth">Smooth Jazz</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization-area">
+                <canvas id="visualizer"></canvas>
+                <div class="playback-controls">
+                    <button id="start-btn" class="main-btn">START</button>
+                    <button id="stop-btn" class="main-btn" disabled>STOP</button>
+                </div>
+                <div class="status-display">
+                    <div class="status-item">
+                        <span class="status-label">Current Chord:</span>
+                        <span id="current-chord" class="status-value">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Playing:</span>
+                        <span id="current-notes" class="status-value">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
