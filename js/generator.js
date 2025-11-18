@@ -257,12 +257,16 @@ export class MusicGenerator {
         progression.forEach(chord => {
             const voicing = this.getChordVoicing(chord.root, chord.type, 4, true);
 
-            // Syncopated rhythm patterns
+            // Syncopated rhythm patterns with anticipations
             const patterns = [
-                [0.5, 2, 3.5],     // Syncopated
-                [1, 2.5],          // On 2 and & of 3
-                [0, 2, 3],         // 1, 3, 4
-                [1.5, 3.5]         // & of 2, & of 4
+                [0.5, 2, 3.5],              // Syncopated
+                [1, 2.5],                   // On 2 and & of 3
+                [0, 2, 3],                  // 1, 3, 4
+                [1.5, 3.5],                 // & of 2, & of 4
+                [0.75, 2.75],               // Anticipations
+                [1.5, 2.5, 3.5],            // Dense offbeats
+                [0, 1.5, 3.75],             // Mixed with anticipation
+                [2, 3.5]                    // Minimal, breathing room
             ];
 
             const pattern = patterns[Math.floor(Math.random() * patterns.length)];
@@ -271,13 +275,16 @@ export class MusicGenerator {
                 // Skip some hits based on density
                 if (Math.random() > density / 100) return;
 
+                // Occasional anticipation (play slightly early)
+                const anticipation = (Math.random() > 0.8) ? -0.125 : 0;
+
                 voicing.forEach((voice, i) => {
                     comping.push({
                         note: voice.note,
                         octave: voice.octave,
-                        duration: 0.8,
-                        time: chord.time + offset,
-                        velocity: 0.4 + Math.random() * 0.2,
+                        duration: 0.6 + Math.random() * 0.3, // Varied duration
+                        time: chord.time + offset + anticipation,
+                        velocity: 0.3 + Math.random() * 0.3, // Varied dynamics
                         stagger: i * 0.01 // Slight stagger for humanization
                     });
                 });

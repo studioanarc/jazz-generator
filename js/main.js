@@ -304,45 +304,59 @@ class JazzApp {
         if (!this.isPlaying) return;
 
         const currentChord = this.progression[this.currentMeasure % this.progression.length];
+        const progressionLength = this.progression.length;
+        const measureInCycle = this.currentMeasure % progressionLength;
 
         // Display current chord
         const chordName = `${currentChord.root}${currentChord.type}`;
         document.getElementById('current-chord').textContent = chordName;
 
-        // Generate parts for this measure
+        // Phrase structure: 4-bar phrases with occasional breaks
+        const isLastMeasureOfPhrase = (measureInCycle + 1) % progressionLength === 0;
+        const shouldBreak = isLastMeasureOfPhrase && Math.random() > 0.7; // Occasional break
+
+        // Generate parts for this measure only
         const measureProgression = [currentChord];
-        const melody = this.generator.generateMelody(
-            measureProgression,
-            this.params.complexity,
-            this.params.density,
-            this.params.swing
-        );
 
         const comping = this.generator.generateComping(
             measureProgression,
-            this.params.density
+            shouldBreak ? this.params.density * 0.3 : this.params.density // Sparse on breaks
         );
 
+        // Generate bass for full progression to get proper approach tones
         const bassline = this.generator.generateWalkingBass(
             this.progression,
             this.params.density,
             this.params.swing
         );
 
+        // Generate drums - add fill at end of phrase
         const drums = this.generator.generateDrumPattern(
             this.params.style,
             this.params.density,
             this.params.swing,
-            16
+            4
         );
 
-        // Filter parts for current measure
+        // Add drum fill at phrase endings
+        if (isLastMeasureOfPhrase && !shouldBreak) {
+            // Add fill on beat 4
+            for (let i = 0; i < 4; i++) {
+                drums.push({
+                    type: 'snare',
+                    time: 3 + (i * 0.25),
+                    velocity: 0.4 + (i * 0.1)
+                });
+            }
+        }
+
+        // Calculate measure boundaries
         const measureStart = this.currentMeasure * 4;
         const measureEnd = measureStart + 4;
 
         // Play piano comping with swing
-        comping.forEach(note => {
-            if (note.time >= measureStart && note.time < measureEnd) {
+        if (!shouldBreak || Math.random() > 0.5) { // Sometimes piano plays through breaks
+            comping.forEach(note => {
                 const time = this.applySwing(note.time - measureStart) + (note.stagger || 0);
                 this.instruments.piano.playNote(
                     note.note,
@@ -351,12 +365,15 @@ class JazzApp {
                     time,
                     note.velocity
                 );
-            }
-        });
+            });
+        }
 
-        // Play bass with swing
+        // Play bass with swing (filter for current measure)
         bassline.forEach(note => {
             if (note.time >= measureStart && note.time < measureEnd) {
+                // Skip some bass notes on breaks for space
+                if (shouldBreak && note.time % 1 !== 0) return;
+
                 const time = this.applySwing(note.time - measureStart);
                 this.instruments.bass.playNote(
                     note.note,
